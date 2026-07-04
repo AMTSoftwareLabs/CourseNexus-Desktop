@@ -13,7 +13,13 @@ export default function Dashboard({ searchQuery = '' }: { searchQuery?: string }
     v.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     (v.moduleName && v.moduleName.toLowerCase().includes(searchQuery.toLowerCase())) ||
     courses.find(c => c.id === v.courseId)?.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ).sort((a, b) => {
+    if (a.courseId !== b.courseId) return a.courseId.localeCompare(b.courseId);
+    const modA = a.moduleName || 'Uncategorized';
+    const modB = b.moduleName || 'Uncategorized';
+    if (modA !== modB) return modA.localeCompare(modB, undefined, { numeric: true, sensitivity: 'base' });
+    return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+  });
 
   const totalWatchTime = videos.reduce((acc, v) => acc + (v.progress || 0), 0);
   const totalCourses = courses.length;

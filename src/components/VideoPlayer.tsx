@@ -8,7 +8,14 @@ export default function VideoPlayer({ courseId, videoId }: { courseId: string, v
   const setView = useStore(state => state.setView);
   const course = useStore(state => state.courses.find(c => c.id === courseId));
   const video = useStore(state => state.videos.find(v => v.id === videoId));
-  const allVideos = useStore(state => state.videos).filter(v => v.courseId === courseId);
+  const allVideos = useStore(state => state.videos)
+    .filter(v => v.courseId === courseId)
+    .sort((a, b) => {
+      const modA = a.moduleName || 'Uncategorized';
+      const modB = b.moduleName || 'Uncategorized';
+      if (modA !== modB) return modA.localeCompare(modB, undefined, { numeric: true, sensitivity: 'base' });
+      return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+    });
   const updateProgress = useStore(state => state.updateVideoProgress);
   const addBookmark = useStore(state => state.addBookmark);
   const deleteBookmark = useStore(state => state.deleteBookmark);
@@ -76,7 +83,7 @@ export default function VideoPlayer({ courseId, videoId }: { courseId: string, v
     if (videoRef.current) {
       videoRef.current.playbackRate = settings.playbackSpeed;
     }
-  }, [settings.playbackSpeed]);
+  }, [settings.playbackSpeed, videoId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -162,13 +169,16 @@ export default function VideoPlayer({ courseId, videoId }: { courseId: string, v
   const handleGenerateTranscript = () => {
     setIsGeneratingTranscript(true);
     setTimeout(() => {
-      let mockTranscript = `[00:00] Welcome to this lecture on ${video?.title}.\n`;
-      mockTranscript += `[00:15] In this session, we will be covering the core concepts and practical applications related to this topic.\n`;
-      mockTranscript += `[01:30] As you can see from the examples, understanding the fundamentals is key to mastering the more advanced techniques.\n`;
-      mockTranscript += `[03:45] Let's take a closer look at how this integrates into the broader system architecture.\n`;
-      mockTranscript += `[05:20] Moving on, we will discuss some common pitfalls and how to avoid them in a production environment.\n`;
-      mockTranscript += `[08:10] To summarize, always remember to test your implementation thoroughly.\n`;
-      mockTranscript += `[09:50] Thank you for watching, and I'll see you in the next lesson.`;
+      let mockTranscript = `[00:00] Welcome to this lecture on ${video?.title}.\n\n`;
+      mockTranscript += `[00:15] In this session, we will be covering the core concepts and practical applications related to this topic. Specifically, we'll dive deep into some advanced techniques.\n\n`;
+      mockTranscript += `[01:30] As you can see from the examples, understanding the fundamentals is key. Let's look at how we can analyze the system. We often use tools like \`nmap\` and \`Wireshark\` for this process. They allow us to inspect the traffic dynamically.\n\n`;
+      mockTranscript += `[03:45] To start the scan, you would typically run a command like this:\n\n\`\`\`bash\nnmap -sC -sV -p- 192.168.1.100\n\`\`\`\n\n`;
+      mockTranscript += `[05:20] Moving on, we will discuss some common pitfalls. Once you've gathered the initial data, you might want to use a framework like \`Metasploit\` to test the vulnerabilities.\n\n`;
+      mockTranscript += `[07:10] The exact command to launch the console is:\n\n\`\`\`bash\nmsfconsole -q\n\`\`\`\n\n`;
+      mockTranscript += `[08:45] After getting your session, always ensure you maintain persistence if required by the engagement scope. We can use \`BloodHound\` to map out the Active Directory environment.\n\n`;
+      mockTranscript += `[10:30] Here's how you might ingest the data:\n\n\`\`\`bash\nbloodhound-python -u username -p password -d domain.local -c All\n\`\`\`\n\n`;
+      mockTranscript += `[12:15] To summarize, always remember to test your implementation thoroughly. \`mimikatz\` is another excellent utility you might find yourself using frequently for credential dumping.\n\n`;
+      mockTranscript += `[14:50] Thank you for watching, and I'll see you in the next lesson. Make sure to practice these commands in your own lab environment.`;
       
       setTranscript(videoId, mockTranscript);
       setIsGeneratingTranscript(false);
@@ -262,9 +272,11 @@ export default function VideoPlayer({ courseId, videoId }: { courseId: string, v
           
           <div className="w-full aspect-video bg-slate-900 rounded-[32px] overflow-hidden shadow-xl relative flex items-center justify-center border border-slate-800">
             {objectUrl ? (
-              <video 
+              <video
+                key={videoId}
                 ref={videoRef}
-                src={objectUrl} 
+                src={objectUrl}
+                autoPlay
                 controls 
                 className="w-full h-full"
                 onTimeUpdate={handleTimeUpdate}
@@ -439,8 +451,27 @@ export default function VideoPlayer({ courseId, videoId }: { courseId: string, v
               ) : (
                 <div className="flex flex-col flex-1">
                    {video.transcript ? (
-                      <div className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 overflow-y-auto font-mono text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap transition-colors">
-                        {video.transcript}
+                      <div className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 overflow-y-auto font-mono text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap transition-colors prose prose-slate dark:prose-invert max-w-none">
+                        <ReactMarkdown
+                          components={{
+                            code({node, inline, className, children, ...props}: any) {
+                              const match = /language-(\w+)/.exec(className || '')
+                              return !inline ? (
+                                <div className="bg-slate-800 text-slate-50 p-4 rounded-xl my-4 overflow-x-auto text-sm font-mono shadow-inner">
+                                  <code className={className} {...props}>
+                                    {children}
+                                  </code>
+                                </div>
+                              ) : (
+                                <code className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-md font-bold text-sm" {...props}>
+                                  {children}
+                                </code>
+                              )
+                            }
+                          }}
+                        >
+                          {video.transcript}
+                        </ReactMarkdown>
                       </div>
                    ) : (
                       <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 border-dashed p-8 text-center transition-colors">

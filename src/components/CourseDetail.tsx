@@ -172,12 +172,12 @@ export default function CourseDetail({ courseId }: { courseId: string }) {
                 acc[module].push(video);
                 return acc;
               }, {} as Record<string, typeof videos>)
-            ).sort(([a], [b]) => a.localeCompare(b)).map(([moduleName, moduleVideos]) => (
+            ).sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })).map(([moduleName, moduleVideos]) => (
               <div key={moduleName} className="flex flex-col gap-3">
                 {moduleName !== 'Uncategorized' && (
                   <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 mt-2 transition-colors">{moduleName}</h3>
                 )}
-                {moduleVideos.map((video, index) => {
+                {moduleVideos.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' })).map((video, index) => {
                   const progressPercent = video.duration > 0 ? (video.progress / video.duration) * 100 : 0;
                   return (
                     <div key={video.id} className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-between group hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shadow-sm">
