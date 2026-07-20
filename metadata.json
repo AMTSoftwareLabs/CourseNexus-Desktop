@@ -1,6 +1,0 @@
-{
-  "name": "Nexus",
-  "description": "A desktop-like web application for tracking and playing local course videos with progress and bookmarks.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
