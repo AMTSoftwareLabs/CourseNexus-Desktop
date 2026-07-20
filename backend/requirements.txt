@@ -1,0 +1,22 @@
+# Core Web & API Server
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+jinja2>=3.1.2
+
+# Offline AI LLM Engine (GGUF Loader)
+# Note: For GPU support on Windows, install C++ Build Tools and run:
+# set CMAKE_ARGS=-DLLAMA_CUDA=on
+# pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+llama-cpp-python>=0.2.75
+
+# Offline Audio Transcription Engine (Whisper)
+faster-whisper>=1.0.0
+
+# Model Downloader & Management
+huggingface-hub>=0.16.4
+hf-transfer>=0.1.4
+
+# Optional: PyTorch for CUDA/GPU checks
+torch>=2.0.0

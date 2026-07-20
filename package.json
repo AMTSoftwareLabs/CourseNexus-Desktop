@@ -1,0 +1,83 @@
+{
+  "name": "course-nexus-desktop",
+  "version": "2.1.0",
+  "type": "module",
+  "main": "electron-main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "node generate_icons.cjs && vite build",
+    "lint": "tsc --noEmit",
+    "start": "electron .",
+    "electron:start": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder build --win --mac --linux",
+    "electron:build:win": "npm run build && electron-builder build --win",
+    "build:exe": "npm run build && electron-builder build --win"
+  },
+  "build": {
+    "appId": "com.nexus.offlineai",
+    "productName": "Course Nexus Desktop",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "icon": "build/icon.png",
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "files": [
+      "dist/**/*",
+      "electron-main.cjs",
+      "preload.cjs",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "icon": "build/icon.png"
+    }
+  },
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.84",
+    "@xenova/transformers": "^2.17.2",
+    "clsx": "^2.1.1",
+    "docx": "^9.7.1",
+    "express": "^4.19.2",
+    "file-saver": "^2.0.5",
+    "idb-keyval": "^6.3.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.378.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.9.2",
+    "tailwind-merge": "^3.6.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/express": "^4.17.21",
+    "@types/file-saver": "^2.0.7",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.21.4",
+    "jimp": "^1.6.1",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12"
+  }
+}
